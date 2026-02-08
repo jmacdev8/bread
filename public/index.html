@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Bread Reading</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: #fff;
+      color: #1a1a1a;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 28px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .app-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: #888;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    .date-display {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: #888;
+      font-weight: 400;
+    }
+
+    .date-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pick-date-btn {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      color: #555;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .pick-date-btn:hover {
+      background: #eee;
+    }
+
+    .nav-arrow {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 18px;
+      color: #888;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.15s;
+      line-height: 1;
+    }
+
+    .nav-arrow:hover {
+      background: #f0f0f0;
+    }
+
+    /* Hidden native date input */
+    .date-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 20px 0;
+    }
+
+    /* Topic */
+    .topic {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #b0a090;
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
+
+    /* Passage title row */
+    .passage-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .passage-title {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 28px;
+      font-weight: 400;
+      color: #1a1a1a;
+    }
+
+    .translation-badge {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      color: #999;
+      font-weight: 400;
+    }
+
+    /* Scripture text */
+    .scripture {
+      font-size: 18px;
+      line-height: 1.8;
+      color: #2a2a2a;
+    }
+
+    .verse-num {
+      font-size: 12px;
+      color: #b0a090;
+      vertical-align: super;
+      margin-right: 2px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-style: italic;
+    }
+
+    .read-prompt {
+      margin-top: 24px;
+      padding: 20px;
+      color: #888;
+      font-size: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-align: center;
+    }
+
+    /* No reading state */
+    .no-reading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+      font-size: 16px;
+    }
+
+    .no-reading .emoji {
+      font-size: 32px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    /* Date picker overlay */
+    .date-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.15);
+      z-index: 100;
+    }
+
+    .date-overlay.active {
+      display: block;
+    }
+
+    .copyright {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11px;
+      color: #bbb;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 16px 16px 60px;
+      }
+
+      .passage-title {
+        font-size: 24px;
+      }
+
+      .scripture {
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-top">
+        <span class="app-title">Daily Bread Reading</span>
+      </div>
+      <div class="date-nav">
+        <button class="nav-arrow" id="prevDay" title="Previous day">&lsaquo;</button>
+        <span class="date-display" id="dateDisplay"></span>
+        <button class="nav-arrow" id="nextDay" title="Next day">&rsaquo;</button>
+        <button class="pick-date-btn" id="pickDateBtn">pick date</button>
+        <input type="date" class="date-input" id="dateInput">
+      </div>
+    </div>
+
+    <div id="content"></div>
+  </div>
+
+  <div class="date-overlay" id="dateOverlay"></div>
+
+  <script>
+    // Reading plan generated from BREAD_2026_Reading_Plan.csv
+    const readings = {
+      "2026-01-04": { topic: "Chosen by God", passage: "Psalm 89:1-18" },
+      "2026-01-05": { topic: "Chosen by God", passage: "John 15:12-17" },
+      "2026-01-06": { topic: "Chosen by God", passage: "1 Thessalonians 1:2-10" },
+      "2026-01-07": { topic: "Chosen by God", passage: "Isaiah 42:1-9" },
+      "2026-01-08": { topic: "Chosen by God", passage: "Luke 10:1-12" },
+      "2026-01-09": { topic: "Chosen by God", passage: "1 Peter 2:1-10" },
+      "2026-01-10": { topic: "Chosen by God", passage: "Colossians 3:12-17" },
+      "2026-01-11": { topic: "God's Eternal Purpose", passage: "Psalm 45" },
+      "2026-01-12": { topic: "God's Eternal Purpose", passage: "Isaiah 46:5-11" },
+      "2026-01-13": { topic: "God's Eternal Purpose", passage: "Hebrews 6:9-20" },
+      "2026-01-14": { topic: "God's Eternal Purpose", passage: "Matthew 19:16-30" },
+      "2026-01-15": { topic: "God's Eternal Purpose", passage: "Matthew 6:25-34" },
+      "2026-01-16": { topic: "God's Eternal Purpose", passage: "1 Corinthians 3:10-17" },
+      "2026-01-17": { topic: "God's Eternal Purpose", passage: "2 Timothy 1:1-14" },
+      "2026-01-18": { topic: "Following Jesus", passage: "Psalm 148" },
+      "2026-01-19": { topic: "Following Jesus", passage: "John 1:35-51" },
+      "2026-01-20": { topic: "Following Jesus", passage: "Matthew 9:9-13" },
+      "2026-01-21": { topic: "Following Jesus", passage: "Luke 9:23-27" },
+      "2026-01-22": { topic: "Following Jesus", passage: "Matthew 10:34-42" },
+      "2026-01-23": { topic: "Following Jesus", passage: "John 10:22-30" },
+      "2026-01-24": { topic: "Following Jesus", passage: "Matthew 11:25-30" },
+      "2026-01-25": { topic: "The Call of God", passage: "Psalm 131" },
+      "2026-01-26": { topic: "The Call of God", passage: "Luke 5:1-11" },
+      "2026-01-27": { topic: "The Call of God", passage: "Jeremiah 1:1-10" },
+      "2026-01-28": { topic: "The Call of God", passage: "Romans 1:1-7" },
+      "2026-01-29": { topic: "The Call of God", passage: "1 Peter 1:13-25" },
+      "2026-01-30": { topic: "The Call of God", passage: "1 Peter 3:8-12" },
+      "2026-01-31": { topic: "The Call of God", passage: "John 21:15-23" },
+      "2026-02-01": { topic: "The Power of God's Word", passage: "Psalm 29" },
+      "2026-02-02": { topic: "The Power of God's Word", passage: "John 1:1-13" },
+      "2026-02-03": { topic: "The Power of God's Word", passage: "Genesis 1:1-19" },
+      "2026-02-04": { topic: "The Power of God's Word", passage: "Genesis 1:20-31" },
+      "2026-02-05": { topic: "The Power of God's Word", passage: "Matthew 9:1-8" },
+      "2026-02-06": { topic: "The Power of God's Word", passage: "2 Corinthians 12:1-10" },
+      "2026-02-07": { topic: "The Power of God's Word", passage: "1 Peter 1:3-9" },
+      "2026-02-08": { topic: "The Meaning of Discipleship", passage: "Psalm 32" },
+      "2026-02-09": { topic: "The Meaning of Discipleship", passage: "Luke 14:7-14" },
+      "2026-02-10": { topic: "The Meaning of Discipleship", passage: "Luke 9:57-62" },
+      "2026-02-11": { topic: "The Meaning of Discipleship", passage: "Luke 14:25-34" },
+      "2026-02-12": { topic: "The Meaning of Discipleship", passage: "John 6:60-71" },
+      "2026-02-13": { topic: "The Meaning of Discipleship", passage: "Acts 4:32-37" },
+      "2026-02-14": { topic: "The Meaning of Discipleship", passage: "Romans 15:1-13" },
+      "2026-02-15": { topic: "God's Transforming Power", passage: "Psalm 66" },
+      "2026-02-16": { topic: "God's Transforming Power", passage: "2 Corinthians 3:4-18" },
+      "2026-02-17": { topic: "God's Transforming Power", passage: "1 Peter 1:13-25" },
+      "2026-02-18": { topic: "God's Transforming Power", passage: "Hebrews 1:1-4" },
+      "2026-02-19": { topic: "God's Transforming Power", passage: "Jeremiah 32:16-27" },
+      "2026-02-20": { topic: "God's Transforming Power", passage: "Luke 9:1-6" },
+      "2026-02-21": { topic: "God's Transforming Power", passage: "Luke 24:36-53" },
+      "2026-02-22": { topic: "Getting Ready to Serve", passage: "Psalm 19" },
+      "2026-02-23": { topic: "Getting Ready to Serve", passage: "Luke 16:1-13" },
+      "2026-02-24": { topic: "Getting Ready to Serve", passage: "Matthew 20:20-28" },
+      "2026-02-25": { topic: "Getting Ready to Serve", passage: "Philippians 2:1-11" },
+      "2026-02-26": { topic: "Getting Ready to Serve", passage: "Hebrews 12:12-17" },
+      "2026-02-27": { topic: "Getting Ready to Serve", passage: "1 Peter 4:1-11" },
+      "2026-02-28": { topic: "Getting Ready to Serve", passage: "John 12:20-36" },
+      "2026-03-01": { topic: "What God Has Promised", passage: "Psalm 119:33-48" },
+      "2026-03-02": { topic: "What God Has Promised", passage: "1 Kings 8:22-30" },
+      "2026-03-03": { topic: "What God Has Promised", passage: "Nehemiah 9:6-25" },
+      "2026-03-04": { topic: "What God Has Promised", passage: "Romans 4:16-25" },
+      "2026-03-05": { topic: "What God Has Promised", passage: "James 1:1-15" },
+      "2026-03-06": { topic: "What God Has Promised", passage: "2 Corinthians 1:12-22" },
+      "2026-03-07": { topic: "What God Has Promised", passage: "2 Peter 3:5-13" },
+      "2026-03-08": { topic: "Meeting God Face to Face", passage: "Psalm 27" },
+      "2026-03-09": { topic: "Meeting God Face to Face", passage: "Genesis 32:22-32" },
+      "2026-03-10": { topic: "Meeting God Face to Face", passage: "Exodus 3:1-12" },
+      "2026-03-11": { topic: "Meeting God Face to Face", passage: "Isaiah 55" },
+      "2026-03-12": { topic: "Meeting God Face to Face", passage: "2 Corinthians 4:1-6" },
+      "2026-03-13": { topic: "Meeting God Face to Face", passage: "1 Corinthians 13:1-13" },
+      "2026-03-14": { topic: "Meeting God Face to Face", passage: "Romans 8:1-17" },
+      "2026-03-15": { topic: "The God Who Seeks", passage: "Psalm 107" },
+      "2026-03-16": { topic: "The God Who Seeks", passage: "Luke 19:1-10" },
+      "2026-03-17": { topic: "The God Who Seeks", passage: "Matthew 18:10-14" },
+      "2026-03-18": { topic: "The God Who Seeks", passage: "Ezekiel 36:22-30" },
+      "2026-03-19": { topic: "The God Who Seeks", passage: "Jeremiah 30:1-10" },
+      "2026-03-20": { topic: "The God Who Seeks", passage: "Hebrews 2:1-18" },
+      "2026-03-21": { topic: "The God Who Seeks", passage: "Romans 5:1-11" },
+      "2026-03-22": { topic: "Power to Give Life", passage: "Psalm 36" },
+      "2026-03-23": { topic: "Power to Give Life", passage: "John 17:1-19" },
+      "2026-03-24": { topic: "Power to Give Life", passage: "Romans 6:1-14" },
+      "2026-03-25": { topic: "Power to Give Life", passage: "John 10:22-30" },
+      "2026-03-26": { topic: "Power to Give Life", passage: "Matthew 16:21-28" },
+      "2026-03-27": { topic: "Power to Give Life", passage: "Luke 8:40-56" },
+      "2026-03-28": { topic: "Power to Give Life", passage: "John 12:44-50" },
+      "2026-03-29": { topic: "The Cost of Right Choices", passage: "Psalm 56" },
+      "2026-03-30": { topic: "The Cost of Right Choices", passage: "Acts 14:19-28" },
+      "2026-03-31": { topic: "The Cost of Right Choices", passage: "1 Peter 2:21-25" },
+      "2026-04-01": { topic: "The Cost of Right Choices", passage: "1 Corinthians 1:3-11" },
+      "2026-04-02": { topic: "The Cost of Right Choices", passage: "Isaiah 53:1-6" },
+      "2026-04-03": { topic: "The Cost of Right Choices", passage: "Isaiah 53:7-9" },
+      "2026-04-04": { topic: "The Cost of Right Choices", passage: "Isaiah 53:10-12" },
+      "2026-04-05": { topic: "The Living Christ", passage: "Psalm 23" },
+      "2026-04-06": { topic: "The Living Christ", passage: "Acts 3:11-16" },
+      "2026-04-07": { topic: "The Living Christ", passage: "Acts 4:1-12" },
+      "2026-04-08": { topic: "The Living Christ", passage: "Acts 5:17-32" },
+      "2026-04-09": { topic: "The Living Christ", passage: "Acts 2:22-36" },
+      "2026-04-10": { topic: "The Living Christ", passage: "Ephesians 1:15-23" },
+      "2026-04-11": { topic: "The Living Christ", passage: "2 Corinthians 4:7-18" },
+      "2026-04-12": { topic: "Life in Christ", passage: "Psalm 126" },
+      "2026-04-13": { topic: "Life in Christ", passage: "Romans 6:1-11" },
+      "2026-04-14": { topic: "Life in Christ", passage: "Ephesians 2:1-10" },
+      "2026-04-15": { topic: "Life in Christ", passage: "Galatians 2:11-21" },
+      "2026-04-16": { topic: "Life in Christ", passage: "John 17:1-5" },
+      "2026-04-17": { topic: "Life in Christ", passage: "Romans 6:15-23" },
+      "2026-04-18": { topic: "Life in Christ", passage: "Romans 8:18-30" },
+      "2026-04-19": { topic: "Companionship with the Living Lord", passage: "Psalm 121" },
+      "2026-04-20": { topic: "Companionship with the Living Lord", passage: "Ezekiel 36:22-36" },
+      "2026-04-21": { topic: "Companionship with the Living Lord", passage: "Genesis 17:1-8" },
+      "2026-04-22": { topic: "Companionship with the Living Lord", passage: "Genesis 39:19-23" },
+      "2026-04-23": { topic: "Companionship with the Living Lord", passage: "Philippians 4:1-9" },
+      "2026-04-24": { topic: "Companionship with the Living Lord", passage: "Colossians 2:6-15" },
+      "2026-04-25": { topic: "Companionship with the Living Lord", passage: "Acts 4:23-37" },
+      "2026-04-26": { topic: "The True Shepherd", passage: "Psalm 80" },
+      "2026-04-27": { topic: "The True Shepherd", passage: "Jeremiah 23:1-8" },
+      "2026-04-28": { topic: "The True Shepherd", passage: "Ezekiel 11:14-21" },
+      "2026-04-29": { topic: "The True Shepherd", passage: "Jeremiah 31:10-14" },
+      "2026-04-30": { topic: "The True Shepherd", passage: "John 10:1-18" },
+      "2026-05-01": { topic: "The True Shepherd", passage: "1 Peter 5:1-11" },
+      "2026-05-02": { topic: "The True Shepherd", passage: "Acts 20:17-38" },
+      "2026-05-03": { topic: "Staying Close to God", passage: "Psalm 34" },
+      "2026-05-04": { topic: "Staying Close to God", passage: "Psalm 18:1-19" },
+      "2026-05-05": { topic: "Staying Close to God", passage: "Matthew 7:21-28" },
+      "2026-05-06": { topic: "Staying Close to God", passage: "Mark 12:28-34" },
+      "2026-05-07": { topic: "Staying Close to God", passage: "James 1:19-26" },
+      "2026-05-08": { topic: "Staying Close to God", passage: "Colossians 1:15-29" },
+      "2026-05-09": { topic: "Staying Close to God", passage: "Ephesians 3:14-21" },
+      "2026-05-10": { topic: "Love One Another", passage: "Psalm 128" },
+      "2026-05-11": { topic: "Love One Another", passage: "Romans 12:9-21" },
+      "2026-05-12": { topic: "Love One Another", passage: "Colossians 3:12-17" },
+      "2026-05-13": { topic: "Love One Another", passage: "Galatians 5:1-15" },
+      "2026-05-14": { topic: "Love One Another", passage: "1 John 2:7-17" },
+      "2026-05-15": { topic: "Love One Another", passage: "1 John 3:1-18" },
+      "2026-05-16": { topic: "Love One Another", passage: "1 John 4:7-21" },
+      "2026-05-17": { topic: "That All May Be One", passage: "Psalm 133" },
+      "2026-05-18": { topic: "That All May Be One", passage: "1 Peter 1:13-25" },
+      "2026-05-19": { topic: "That All May Be One", passage: "Titus 3:1-11" },
+      "2026-05-20": { topic: "That All May Be One", passage: "Philemon 1-25" },
+      "2026-05-21": { topic: "That All May Be One", passage: "Hebrews 13:1-25" },
+      "2026-05-22": { topic: "That All May Be One", passage: "2 Timothy 1:1-14" },
+      "2026-05-23": { topic: "That All May Be One", passage: "1 Thessalonians 1:2-10" },
+      "2026-05-24": { topic: "Life in the Spirit", passage: "Psalm 104" },
+      "2026-05-25": { topic: "Life in the Spirit", passage: "Ephesians 4:17-32" },
+      "2026-05-26": { topic: "Life in the Spirit", passage: "Ephesians 3:14-21" },
+      "2026-05-27": { topic: "Life in the Spirit", passage: "Ezekiel 39:21-29" },
+      "2026-05-28": { topic: "Life in the Spirit", passage: "2 Corinthians 1:3-11" },
+      "2026-05-29": { topic: "Life in the Spirit", passage: "2 Corinthians 8:1-15" },
+      "2026-05-30": { topic: "Life in the Spirit", passage: "1 Corinthians 13:1-13" },
+      "2026-05-31": { topic: "God in Three Persons", passage: "Psalm 80" },
+      "2026-06-01": { topic: "God in Three Persons", passage: "Deuteronomy 6:4-25" },
+      "2026-06-02": { topic: "God in Three Persons", passage: "John 5:19-29" },
+      "2026-06-03": { topic: "God in Three Persons", passage: "1 Corinthians 12:1-13" },
+      "2026-06-04": { topic: "God in Three Persons", passage: "Ephesians 1:1-14" },
+      "2026-06-05": { topic: "God in Three Persons", passage: "Colossians 1:1-14" },
+      "2026-06-06": { topic: "God in Three Persons", passage: "John 16:1-11" },
+      "2026-06-07": { topic: "Christ's True Family", passage: "Psalm 40" },
+      "2026-06-08": { topic: "Christ's True Family", passage: "Hosea 6:1-6" },
+      "2026-06-09": { topic: "Christ's True Family", passage: "Hosea 11:1-9" },
+      "2026-06-10": { topic: "Christ's True Family", passage: "Matthew 13:53-58" },
+      "2026-06-11": { topic: "Christ's True Family", passage: "Matthew 21:12-17" },
+      "2026-06-12": { topic: "Christ's True Family", passage: "John 17:20-26" },
+      "2026-06-13": { topic: "Christ's True Family", passage: "Matthew 12:46-50" },
+      "2026-06-14": { topic: "Signs of God's Kingdom", passage: "Psalm 84" },
+      "2026-06-15": { topic: "Signs of God's Kingdom", passage: "Matthew 3:1-10" },
+      "2026-06-16": { topic: "Signs of God's Kingdom", passage: "Matthew 18:21-35" },
+      "2026-06-17": { topic: "Signs of God's Kingdom", passage: "Matthew 20:1-16" },
+      "2026-06-18": { topic: "Signs of God's Kingdom", passage: "Matthew 20:20-28" },
+      "2026-06-19": { topic: "Signs of God's Kingdom", passage: "Luke 9:46-62" },
+      "2026-06-20": { topic: "Signs of God's Kingdom", passage: "Acts 7:54-8:8" },
+      "2026-06-21": { topic: "God Calls & Provides", passage: "Psalm 8" },
+      "2026-06-22": { topic: "God Calls & Provides", passage: "1 Corinthians 2:1-13" },
+      "2026-06-23": { topic: "God Calls & Provides", passage: "Matthew 9:35-10:15" },
+      "2026-06-24": { topic: "God Calls & Provides", passage: "Matthew 10:16-23" },
+      "2026-06-25": { topic: "God Calls & Provides", passage: "Matthew 10:24-33" },
+      "2026-06-26": { topic: "God Calls & Provides", passage: "Matthew 10:34-42" },
+      "2026-06-27": { topic: "God Calls & Provides", passage: "John 21:15-23" },
+      "2026-06-28": { topic: "Consequences of Following Jesus", passage: "Psalm 28" },
+      "2026-06-29": { topic: "Consequences of Following Jesus", passage: "Matthew 12:46-50" },
+      "2026-06-30": { topic: "Consequences of Following Jesus", passage: "Luke 14:25-33" },
+      "2026-07-01": { topic: "Consequences of Following Jesus", passage: "Luke 22:24-30" },
+      "2026-07-02": { topic: "Consequences of Following Jesus", passage: "Luke 9:57-62" },
+      "2026-07-03": { topic: "Consequences of Following Jesus", passage: "Joshua 24:16-28" },
+      "2026-07-04": { topic: "Consequences of Following Jesus", passage: "Romans 14:13-23" },
+      "2026-07-05": { topic: "A Disciple's Mission & Reward", passage: "Psalm 35" },
+      "2026-07-06": { topic: "A Disciple's Mission & Reward", passage: "Matthew 10:1-15" },
+      "2026-07-07": { topic: "A Disciple's Mission & Reward", passage: "Romans 1:1-7" },
+      "2026-07-08": { topic: "A Disciple's Mission & Reward", passage: "John 1:6-13" },
+      "2026-07-09": { topic: "A Disciple's Mission & Reward", passage: "Colossians 1:9-23" },
+      "2026-07-10": { topic: "A Disciple's Mission & Reward", passage: "Colossians 1:24-29" },
+      "2026-07-11": { topic: "A Disciple's Mission & Reward", passage: "1 Peter 1:1-9" },
+      "2026-07-12": { topic: "God's Plan for the Church", passage: "Psalm 46" },
+      "2026-07-13": { topic: "God's Plan for the Church", passage: "Isaiah 55:1-13" },
+      "2026-07-14": { topic: "God's Plan for the Church", passage: "Isaiah 1:10-17" },
+      "2026-07-15": { topic: "God's Plan for the Church", passage: "Isaiah 1:21-26" },
+      "2026-07-16": { topic: "God's Plan for the Church", passage: "Romans 15:1-13" },
+      "2026-07-17": { topic: "God's Plan for the Church", passage: "Ephesians 4:1-16" },
+      "2026-07-18": { topic: "God's Plan for the Church", passage: "John 17:20-26" },
+      "2026-07-19": { topic: "Listening & Obeying", passage: "Psalm 62" },
+      "2026-07-20": { topic: "Listening & Obeying", passage: "Mark 9:1-8" },
+      "2026-07-21": { topic: "Listening & Obeying", passage: "James 1:19-27" },
+      "2026-07-22": { topic: "Listening & Obeying", passage: "James 4:1-10" },
+      "2026-07-23": { topic: "Listening & Obeying", passage: "Romans 6:15-23" },
+      "2026-07-24": { topic: "Listening & Obeying", passage: "Philippians 2:12-18" },
+      "2026-07-25": { topic: "Listening & Obeying", passage: "John 14:15-24" },
+      "2026-07-26": { topic: "God's Ability to Provide", passage: "Psalm 63" },
+      "2026-07-27": { topic: "God's Ability to Provide", passage: "Genesis 22:1-14" },
+      "2026-07-28": { topic: "God's Ability to Provide", passage: "1 Timothy 6:11-19" },
+      "2026-07-29": { topic: "God's Ability to Provide", passage: "Psalm 68:1-10" },
+      "2026-07-30": { topic: "God's Ability to Provide", passage: "John 10:1-18" },
+      "2026-07-31": { topic: "God's Ability to Provide", passage: "Matthew 7:1-12" },
+      "2026-08-01": { topic: "God's Ability to Provide", passage: "1 Peter 5:1-11" },
+      "2026-08-02": { topic: "Establishing the Right Priorities", passage: "Psalm 73" },
+      "2026-08-03": { topic: "Establishing the Right Priorities", passage: "Luke 10:38-42" },
+      "2026-08-04": { topic: "Establishing the Right Priorities", passage: "Romans 8:18-25" },
+      "2026-08-05": { topic: "Establishing the Right Priorities", passage: "2 Corinthians 6:1-13" },
+      "2026-08-06": { topic: "Establishing the Right Priorities", passage: "Revelation 19:1-8" },
+      "2026-08-07": { topic: "Establishing the Right Priorities", passage: "Hebrews 10:19-39" },
+      "2026-08-08": { topic: "Establishing the Right Priorities", passage: "Colossians 3:5-17" },
+      "2026-08-09": { topic: "Facing Life's Uncertainties", passage: "Psalm 127" },
+      "2026-08-10": { topic: "Facing Life's Uncertainties", passage: "Isaiah 54:9-17" },
+      "2026-08-11": { topic: "Facing Life's Uncertainties", passage: "Hebrews 10:1-10" },
+      "2026-08-12": { topic: "Facing Life's Uncertainties", passage: "2 Peter 1:1-11" },
+      "2026-08-13": { topic: "Facing Life's Uncertainties", passage: "1 Peter 3:13-22" },
+      "2026-08-14": { topic: "Facing Life's Uncertainties", passage: "1 Peter 4:12-19" },
+      "2026-08-15": { topic: "Facing Life's Uncertainties", passage: "John 17:1-19" },
+      "2026-08-16": { topic: "The Mystery of God's Gifts", passage: "Psalm 145" },
+      "2026-08-17": { topic: "The Mystery of God's Gifts", passage: "Matthew 8:1-4" },
+      "2026-08-18": { topic: "The Mystery of God's Gifts", passage: "Matthew 8:5-13" },
+      "2026-08-19": { topic: "The Mystery of God's Gifts", passage: "Matthew 8:14-17" },
+      "2026-08-20": { topic: "The Mystery of God's Gifts", passage: "Matthew 9:18-26" },
+      "2026-08-21": { topic: "The Mystery of God's Gifts", passage: "Matthew 9:27-34" },
+      "2026-08-22": { topic: "The Mystery of God's Gifts", passage: "Mark 10:46-52" },
+      "2026-08-23": { topic: "The Centrality of Christ", passage: "Psalm 18:1-19" },
+      "2026-08-24": { topic: "The Centrality of Christ", passage: "John 1:19-28" },
+      "2026-08-25": { topic: "The Centrality of Christ", passage: "John 14:1-11" },
+      "2026-08-26": { topic: "The Centrality of Christ", passage: "Colossians 1:15-23" },
+      "2026-08-27": { topic: "The Centrality of Christ", passage: "John 6:66-71" },
+      "2026-08-28": { topic: "The Centrality of Christ", passage: "John 12:20-36" },
+      "2026-08-29": { topic: "The Centrality of Christ", passage: "John 11:1-16" },
+      "2026-08-30": { topic: "True Discipleship", passage: "Psalm 1" },
+      "2026-08-31": { topic: "True Discipleship", passage: "Philippians 2:1-8" },
+      "2026-09-01": { topic: "True Discipleship", passage: "Galatians 5:16-24" },
+      "2026-09-02": { topic: "True Discipleship", passage: "Matthew 5:1-11" },
+      "2026-09-03": { topic: "True Discipleship", passage: "Matthew 5:12-16" },
+      "2026-09-04": { topic: "True Discipleship", passage: "Matthew 7:21-28" },
+      "2026-09-05": { topic: "True Discipleship", passage: "Matthew 5:43-48" },
+      "2026-09-06": { topic: "Reconciliation", passage: "Psalm 130" },
+      "2026-09-07": { topic: "Reconciliation", passage: "2 Corinthians 5:16-21" },
+      "2026-09-08": { topic: "Reconciliation", passage: "Romans 5:1-11" },
+      "2026-09-09": { topic: "Reconciliation", passage: "2 Corinthians 13:1-12" },
+      "2026-09-10": { topic: "Reconciliation", passage: "Acts 10:34-43" },
+      "2026-09-11": { topic: "Reconciliation", passage: "Luke 6:37-42" },
+      "2026-09-12": { topic: "Reconciliation", passage: "Luke 17:1-6" },
+      "2026-09-13": { topic: "God's Unlimited Grace", passage: "Psalm 141" },
+      "2026-09-14": { topic: "God's Unlimited Grace", passage: "Colossians 2:8-15" },
+      "2026-09-15": { topic: "God's Unlimited Grace", passage: "Ephesians 2:1-10" },
+      "2026-09-16": { topic: "God's Unlimited Grace", passage: "Romans 6:1-14" },
+      "2026-09-17": { topic: "God's Unlimited Grace", passage: "Romans 8:1-11" },
+      "2026-09-18": { topic: "God's Unlimited Grace", passage: "2 Timothy 2:1-13" },
+      "2026-09-19": { topic: "God's Unlimited Grace", passage: "John 8:1-11" },
+      "2026-09-20": { topic: "Good Stewards", passage: "Psalm 3" },
+      "2026-09-21": { topic: "Good Stewards", passage: "1 Corinthians 4:1-7" },
+      "2026-09-22": { topic: "Good Stewards", passage: "1 Corinthians 4:8-13" },
+      "2026-09-23": { topic: "Good Stewards", passage: "1 Thessalonians 1:1-10" },
+      "2026-09-24": { topic: "Good Stewards", passage: "2 Thessalonians 1:1-4" },
+      "2026-09-25": { topic: "Good Stewards", passage: "Luke 12:35-40" },
+      "2026-09-26": { topic: "Good Stewards", passage: "Luke 12:41-48" },
+      "2026-09-27": { topic: "Who Enters God's Kingdom?", passage: "Psalm 33" },
+      "2026-09-28": { topic: "Who Enters God's Kingdom?", passage: "Matthew 10:40-42" },
+      "2026-09-29": { topic: "Who Enters God's Kingdom?", passage: "Matthew 12:22-37" },
+      "2026-09-30": { topic: "Who Enters God's Kingdom?", passage: "Matthew 12:46-50" },
+      "2026-10-01": { topic: "Who Enters God's Kingdom?", passage: "Luke 18:1-8" },
+      "2026-10-02": { topic: "Who Enters God's Kingdom?", passage: "Luke 18:9-14" },
+      "2026-10-03": { topic: "Who Enters God's Kingdom?", passage: "Romans 8:31-39" },
+      "2026-10-04": { topic: "Faithful & Obedient", passage: "Psalm 92" },
+      "2026-10-05": { topic: "Faithful & Obedient", passage: "Hebrews 11:1-16" },
+      "2026-10-06": { topic: "Faithful & Obedient", passage: "Acts 8:1-8" },
+      "2026-10-07": { topic: "Faithful & Obedient", passage: "Acts 11:19-26" },
+      "2026-10-08": { topic: "Faithful & Obedient", passage: "Matthew 21:28-32" },
+      "2026-10-09": { topic: "Faithful & Obedient", passage: "Luke 12:35-40" },
+      "2026-10-10": { topic: "Faithful & Obedient", passage: "Luke 12:41-48" },
+      "2026-10-11": { topic: "All Things Are Possible", passage: "Psalm 103" },
+      "2026-10-12": { topic: "All Things Are Possible", passage: "Exodus 3:7-22" },
+      "2026-10-17": { topic: "All Things Are Possible", passage: "Hebrews 1:1-14" },
+      "2026-10-18": { topic: "Servanthood", passage: "Psalm 71" },
+      "2026-10-19": { topic: "Servanthood", passage: "John 13:1-11" },
+      "2026-10-20": { topic: "Servanthood", passage: "Romans 15:1-13" },
+      "2026-10-21": { topic: "Servanthood", passage: "2 Corinthians 6:1-10" },
+      "2026-10-22": { topic: "Servanthood", passage: "2 Corinthians 4:1-13" },
+      "2026-10-23": { topic: "Servanthood", passage: "2 Corinthians 7:1-13" },
+      "2026-10-24": { topic: "Servanthood", passage: "Matthew 10:24-39" },
+      "2026-10-25": { topic: "When Jesus Calls", passage: "Psalm 139" },
+      "2026-10-26": { topic: "When Jesus Calls", passage: "Luke 7:36-50" },
+      "2026-10-27": { topic: "When Jesus Calls", passage: "Mark 5:1-20" },
+      "2026-10-28": { topic: "When Jesus Calls", passage: "Matthew 9:1-12" },
+      "2026-10-29": { topic: "When Jesus Calls", passage: "Acts 9:10-18" },
+      "2026-10-30": { topic: "When Jesus Calls", passage: "Luke 6:27-36" },
+      "2026-10-31": { topic: "When Jesus Calls", passage: "John 9:1-12, 35-41" },
+      "2026-11-01": { topic: "True Humanity", passage: "Psalm 4" },
+      "2026-11-02": { topic: "True Humanity", passage: "Romans 8:1-17" },
+      "2026-11-03": { topic: "True Humanity", passage: "2 Timothy 1:1-14" },
+      "2026-11-04": { topic: "True Humanity", passage: "1 Peter 2:21-25" },
+      "2026-11-05": { topic: "True Humanity", passage: "Romans 14:1-21" },
+      "2026-11-06": { topic: "True Humanity", passage: "Matthew 6:25-34" },
+      "2026-11-07": { topic: "True Humanity", passage: "Matthew 19:16-29" },
+      "2026-11-08": { topic: "A Resurrection People", passage: "Psalm 90" },
+      "2026-11-09": { topic: "A Resurrection People", passage: "John 11:1-16" },
+      "2026-11-10": { topic: "A Resurrection People", passage: "John 11:17-27" },
+      "2026-11-11": { topic: "A Resurrection People", passage: "John 11:28-37" },
+      "2026-11-12": { topic: "A Resurrection People", passage: "John 11:38-44" },
+      "2026-11-13": { topic: "A Resurrection People", passage: "Acts 17:22-23" },
+      "2026-11-14": { topic: "A Resurrection People", passage: "Romans 6:1-11" },
+      "2026-11-15": { topic: "Faithful Witness", passage: "Psalm 16" },
+      "2026-11-16": { topic: "Faithful Witness", passage: "Philippians 1:12-18" },
+      "2026-11-17": { topic: "Faithful Witness", passage: "Luke 12:1-12" },
+      "2026-11-18": { topic: "Faithful Witness", passage: "Colossians 4:1-6" },
+      "2026-11-19": { topic: "Faithful Witness", passage: "Matthew 20:1-16" },
+      "2026-11-20": { topic: "Faithful Witness", passage: "John 5:30-47" },
+      "2026-11-21": { topic: "Faithful Witness", passage: "Acts 10:34-38" },
+      "2026-11-22": { topic: "Christ the King", passage: "Psalm 47" },
+      "2026-11-23": { topic: "Christ the King", passage: "Matthew 16:21-28" },
+      "2026-11-24": { topic: "Christ the King", passage: "John 6:15-21" },
+      "2026-11-25": { topic: "Christ the King", passage: "John 1:43-51" },
+      "2026-11-26": { topic: "Christ the King", passage: "Acts 17:1-9" },
+      "2026-11-27": { topic: "Christ the King", passage: "1 Corinthians 15:20-28" },
+      "2026-11-28": { topic: "Christ the King", passage: "Revelation 1:1-8" },
+      "2026-11-29": { topic: "Waiting & Watching", passage: "Psalm 97" },
+      "2026-11-30": { topic: "Waiting & Watching", passage: "Luke 1:67-80" },
+      "2026-12-01": { topic: "Waiting & Watching", passage: "Colossians 1:9-23" },
+      "2026-12-02": { topic: "Waiting & Watching", passage: "Mark 1:1-8" },
+      "2026-12-03": { topic: "Waiting & Watching", passage: "Isaiah 43:1-13" },
+      "2026-12-04": { topic: "Waiting & Watching", passage: "Hebrews 10:11-25" },
+      "2026-12-05": { topic: "Waiting & Watching", passage: "Zephaniah 3:14-20" },
+      "2026-12-06": { topic: "Getting Ready", passage: "Psalm 62" },
+      "2026-12-07": { topic: "Getting Ready", passage: "Luke 1:5-25" },
+      "2026-12-08": { topic: "Getting Ready", passage: "Luke 1:57-80" },
+      "2026-12-09": { topic: "Getting Ready", passage: "Matthew 3:1-12" },
+      "2026-12-10": { topic: "Getting Ready", passage: "Isaiah 62:1-12" },
+      "2026-12-11": { topic: "Getting Ready", passage: "Luke 12:35-48" },
+      "2026-12-12": { topic: "Getting Ready", passage: "Isaiah 51:1-8" },
+      "2026-12-13": { topic: "Good News", passage: "Psalm 80" },
+      "2026-12-14": { topic: "Good News", passage: "Mark 13:1-13" },
+      "2026-12-15": { topic: "Good News", passage: "Luke 21:25-36" },
+      "2026-12-16": { topic: "Good News", passage: "Revelation 1:1-8" },
+      "2026-12-17": { topic: "Good News", passage: "John 1:14-18" },
+      "2026-12-18": { topic: "Good News", passage: "Ezekiel 34:11-16" },
+      "2026-12-19": { topic: "Good News", passage: "Acts 1:1-11" },
+      "2026-12-20": { topic: "When God Comes", passage: "Psalm 65" },
+      "2026-12-21": { topic: "When God Comes", passage: "James 5:7-18" },
+      "2026-12-22": { topic: "When God Comes", passage: "Matthew 1:18-25" },
+      "2026-12-23": { topic: "When God Comes", passage: "Isaiah 40:1-11" },
+      "2026-12-24": { topic: "When God Comes", passage: "Ezekiel 34:17-31" },
+      "2026-12-25": { topic: "When God Comes", passage: "Isaiah 9:1-7" },
+      "2026-12-26": { topic: "When God Comes", passage: "Philippians 4:4-9" },
+      "2026-12-27": { topic: "God's Greatest Gift", passage: "Psalm 96" },
+      "2026-12-28": { topic: "God's Greatest Gift", passage: "Exodus 20:18-26" },
+      "2026-12-29": { topic: "God's Greatest Gift", passage: "Galatians 3:23-4:7" },
+      "2026-12-30": { topic: "God's Greatest Gift", passage: "2 Corinthians 5:16-21" },
+      "2026-12-31": { topic: "God's Greatest Gift", passage: "John 3:1-8" },
+    };
+
+    // ============================================================
+    // APP LOGIC
+    // ============================================================
+    let currentDate = new Date();
+    const passageCache = {};
+
+    function formatDateKey(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDisplayDate(date) {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${days[date.getDay()]} | ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    }
+
+    async function loadPassage(dateKey) {
+      if (passageCache[dateKey]) return passageCache[dateKey];
+      try {
+        const res = await fetch(`/passages/${dateKey}.json`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        passageCache[dateKey] = data;
+        return data;
+      } catch {
+        return null;
+      }
+    }
+
+    async function render() {
+      const key = formatDateKey(currentDate);
+      const reading = readings[key];
+      const content = document.getElementById('content');
+
+      document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate);
+      document.getElementById('dateInput').value = key;
+
+      if (!reading) {
+        content.innerHTML = `
+          <hr class="divider">
+          <div class="no-reading">
+            No reading available for this date.
+          </div>
+        `;
+        return;
+      }
+
+      // Show header immediately, then load verses
+      content.innerHTML = `
+        <hr class="divider">
+        <div class="topic">${reading.topic}</div>
+        <div class="passage-row">
+          <h1 class="passage-title">${reading.passage}</h1>
+          <span class="translation-badge">NIV</span>
+        </div>
+        <hr class="divider">
+        <div class="scripture" id="verses">Loading...</div>
+      `;
+
+      const passage = await loadPassage(key);
+      // Check we're still on the same date (user may have navigated)
+      if (formatDateKey(currentDate) !== key) return;
+
+      const versesEl = document.getElementById('verses');
+      if (passage && passage.verses) {
+        versesEl.innerHTML = passage.verses;
+        // Add copyright notice
+        const copyrightEl = document.createElement('div');
+        copyrightEl.className = 'copyright';
+        copyrightEl.textContent = passage.copyright || '';
+        versesEl.parentNode.appendChild(copyrightEl);
+      } else {
+        versesEl.innerHTML = '<span class="read-prompt">Passage text not yet available. Open your Bible to read today\'s passage.</span>';
+      }
+    }
+
+    // Navigation
+    document.getElementById('prevDay').addEventListener('click', () => {
+      currentDate.setDate(currentDate.getDate() - 1);
+      render();
+    });
+
+    document.getElementById('nextDay').addEventListener('click', () => {
+      currentDate.setDate(currentDate.getDate() + 1);
+      render();
+    });
+
+    // Date picker
+    const dateInput = document.getElementById('dateInput');
+    const pickDateBtn = document.getElementById('pickDateBtn');
+
+    pickDateBtn.addEventListener('click', () => {
+      dateInput.showPicker();
+    });
+
+    dateInput.addEventListener('change', (e) => {
+      if (e.target.value) {
+        const parts = e.target.value.split('-');
+        currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        render();
+      }
+    });
+
+    // Initial render — default to today
+    render();
+  </script>
+</body>
+</html>
