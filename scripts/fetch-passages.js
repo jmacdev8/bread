@@ -20,12 +20,23 @@ if (!API_KEY) {
   process.exit(1);
 }
 
-// NIV Bible ID on API.Bible
-const BIBLE_ID = '78a9f6124f344018-01';
+// Bible IDs on API.Bible
+const BIBLE_IDS = {
+  niv: '78a9f6124f344018-01',
+  msg: '6f11a7de016f942e-01',
+};
+
+const TRANSLATION = (process.argv[2] || 'niv').toLowerCase();
+if (!BIBLE_IDS[TRANSLATION]) {
+  console.error(`Unknown translation: "${TRANSLATION}". Available: ${Object.keys(BIBLE_IDS).join(', ')}`);
+  process.exit(1);
+}
+
+const BIBLE_ID = BIBLE_IDS[TRANSLATION];
 const BASE_URL = `https://rest.api.bible/v1/bibles/${BIBLE_ID}`;
 
 const CSV_PATH = path.join(__dirname, '..', 'BREAD_2026_Reading_Plan.csv');
-const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'passages');
+const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'passages', TRANSLATION);
 
 // Book name -> API.Bible book ID mapping
 const BOOK_IDS = {
@@ -140,11 +151,11 @@ function cleanHtml(html) {
   text = text.replace(/<span[^>]*>/gi, '');
   text = text.replace(/<\/span>/gi, '');
 
-  // Convert paragraphs to spaces (we display as flowing text)
-  text = text.replace(/<\/?p[^>]*>/gi, ' ');
+  // Preserve paragraph structure: strip attributes but keep <p> tags
+  text = text.replace(/<p[^>]*>/gi, '<p>');
 
-  // Remove any remaining HTML tags except <sup>
-  text = text.replace(/<(?!\/?sup)[^>]+>/gi, ' ');
+  // Remove any remaining HTML tags except <sup> and <p>
+  text = text.replace(/<(?!\/?sup)(?!\/?p)[^>]+>/gi, ' ');
 
   // Clean up whitespace
   text = text.replace(/\s+/g, ' ').trim();
