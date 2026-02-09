@@ -241,6 +241,294 @@
       text-decoration: underline;
     }
 
+    /* Settings gear */
+    .settings-btn {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      transition: background 0.15s;
+      z-index: 200;
+      color: #999;
+    }
+
+    .settings-btn:hover {
+      background: rgba(0,0,0,0.06);
+    }
+
+    .settings-btn svg {
+      display: block;
+      width: 22px;
+      height: 22px;
+    }
+
+    /* Settings panel */
+    .settings-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.15);
+      z-index: 300;
+    }
+
+    .settings-overlay.active {
+      display: block;
+    }
+
+    .settings-panel {
+      position: fixed;
+      top: 50px;
+      right: 16px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      padding: 20px;
+      z-index: 301;
+      width: 220px;
+      display: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .settings-panel.active {
+      display: block;
+    }
+
+    .settings-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .settings-section {
+      margin-bottom: 18px;
+    }
+
+    .settings-section:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Theme swatches */
+    .theme-swatches {
+      display: flex;
+      gap: 10px;
+    }
+
+    .theme-swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      position: relative;
+    }
+
+    .theme-swatch.active {
+      border-color: #b0a090;
+    }
+
+    .theme-swatch[data-theme="cream"] {
+      background: #faf9f7;
+      border-color: #e0e0e0;
+    }
+    .theme-swatch[data-theme="cream"].active {
+      border-color: #b0a090;
+    }
+
+    .theme-swatch[data-theme="white"] {
+      background: #ffffff;
+      border-color: #e0e0e0;
+    }
+    .theme-swatch[data-theme="white"].active {
+      border-color: #b0a090;
+    }
+
+    .theme-swatch[data-theme="dark"] {
+      background: #1a1a1a;
+      border-color: #444;
+    }
+    .theme-swatch[data-theme="dark"].active {
+      border-color: #b0a090;
+    }
+
+    /* Font size buttons */
+    .font-size-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .font-size-btn {
+      flex: 1;
+      padding: 6px 0;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #f5f5f5;
+      cursor: pointer;
+      font-family: Georgia, 'Times New Roman', serif;
+      text-align: center;
+      transition: background 0.15s;
+      color: #555;
+    }
+
+    .font-size-btn:hover {
+      background: #eee;
+    }
+
+    .font-size-btn.active {
+      background: #e8e4df;
+      border-color: #b0a090;
+    }
+
+    .font-size-btn[data-size="small"] { font-size: 14px; }
+    .font-size-btn[data-size="medium"] { font-size: 17px; }
+    .font-size-btn[data-size="large"] { font-size: 21px; }
+
+    /* Dark mode theme */
+    body.theme-dark {
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+
+    body.theme-dark .passage-title {
+      color: #e0e0e0;
+    }
+
+    body.theme-dark .scripture {
+      color: #d0d0d0;
+    }
+
+    body.theme-dark .app-title,
+    body.theme-dark .date-display {
+      color: #888;
+    }
+
+    body.theme-dark .nav-arrow {
+      color: #888;
+    }
+
+    body.theme-dark .nav-arrow:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    body.theme-dark .pick-date-btn {
+      background: #2a2a2a;
+      border-color: #444;
+      color: #aaa;
+    }
+
+    body.theme-dark .pick-date-btn:hover {
+      background: #333;
+    }
+
+    body.theme-dark .translation-select {
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #aaa;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+    }
+
+    body.theme-dark .translation-select:hover {
+      background-color: #333;
+    }
+
+    body.theme-dark .divider {
+      border-top-color: #333;
+    }
+
+    body.theme-dark .topic {
+      color: #8a7a6a;
+    }
+
+    body.theme-dark .scripture sup {
+      color: #8a7a6a;
+    }
+
+    body.theme-dark .copyright {
+      border-top-color: #333;
+      color: #666;
+    }
+
+    body.theme-dark .attribution {
+      color: #666;
+    }
+
+    body.theme-dark .attribution a {
+      color: #777;
+    }
+
+    body.theme-dark .read-prompt {
+      color: #666;
+    }
+
+    body.theme-dark .no-reading {
+      color: #666;
+    }
+
+    body.theme-dark .settings-btn {
+      color: #888;
+    }
+
+    body.theme-dark .settings-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    body.theme-dark .settings-panel {
+      background: #2a2a2a;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    body.theme-dark .settings-label {
+      color: #888;
+    }
+
+    body.theme-dark .font-size-btn {
+      background: #333;
+      border-color: #444;
+      color: #aaa;
+    }
+
+    body.theme-dark .font-size-btn:hover {
+      background: #3a3a3a;
+    }
+
+    body.theme-dark .font-size-btn.active {
+      background: #444;
+      border-color: #8a7a6a;
+    }
+
+    body.theme-dark .date-overlay {
+      background: rgba(0,0,0,0.4);
+    }
+
+    /* White theme */
+    body.theme-white {
+      background: #ffffff;
+    }
+
+    /* Font size classes */
+    body.font-large .scripture {
+      font-size: 24px;
+    }
+
+    body.font-large .passage-title {
+      font-size: 32px;
+    }
+
+    body.font-small .scripture {
+      font-size: 17px;
+    }
+
+    body.font-small .passage-title {
+      font-size: 24px;
+    }
+
     @media (max-width: 480px) {
       .container {
         padding: 16px 24px 60px;
@@ -252,6 +540,22 @@
 
       .scripture {
         font-size: 18px;
+      }
+
+      body.font-large .scripture {
+        font-size: 22px;
+      }
+
+      body.font-large .passage-title {
+        font-size: 28px;
+      }
+
+      body.font-small .scripture {
+        font-size: 16px;
+      }
+
+      body.font-small .passage-title {
+        font-size: 22px;
       }
     }
   </style>
@@ -275,6 +579,35 @@
 
     <div class="attribution">
       This was created by a member of <a href="https://realitysf.com/" target="_blank" rel="noopener">Reality San Francisco</a>. If you found this helpful, please consider <a href="https://realitysf.com/giving/#ways-to-give" target="_blank" rel="noopener">giving to the church here</a>.
+    </div>
+  </div>
+
+  <!-- Settings gear button -->
+  <button class="settings-btn" id="settingsBtn" title="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+  </button>
+
+  <!-- Settings panel -->
+  <div class="settings-overlay" id="settingsOverlay"></div>
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-section">
+      <div class="settings-label">Theme</div>
+      <div class="theme-swatches">
+        <div class="theme-swatch" data-theme="cream" title="Cream"></div>
+        <div class="theme-swatch" data-theme="white" title="White"></div>
+        <div class="theme-swatch" data-theme="dark" title="Dark"></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">Font Size</div>
+      <div class="font-size-btns">
+        <button class="font-size-btn" data-size="small">A</button>
+        <button class="font-size-btn" data-size="medium">A</button>
+        <button class="font-size-btn" data-size="large">A</button>
+      </div>
     </div>
   </div>
 
@@ -759,6 +1092,56 @@
         currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
         render();
       }
+    });
+
+    // ============================================================
+    // SETTINGS
+    // ============================================================
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const settingsOverlay = document.getElementById('settingsOverlay');
+
+    function toggleSettings() {
+      const isOpen = settingsPanel.classList.contains('active');
+      settingsPanel.classList.toggle('active');
+      settingsOverlay.classList.toggle('active');
+    }
+
+    settingsBtn.addEventListener('click', toggleSettings);
+    settingsOverlay.addEventListener('click', toggleSettings);
+
+    // Theme
+    const savedTheme = localStorage.getItem('theme') || 'cream';
+    function applyTheme(theme) {
+      document.body.classList.remove('theme-dark', 'theme-white');
+      if (theme === 'dark') document.body.classList.add('theme-dark');
+      if (theme === 'white') document.body.classList.add('theme-white');
+      document.querySelectorAll('.theme-swatch').forEach(s => {
+        s.classList.toggle('active', s.dataset.theme === theme);
+      });
+      localStorage.setItem('theme', theme);
+    }
+    applyTheme(savedTheme);
+
+    document.querySelectorAll('.theme-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => applyTheme(swatch.dataset.theme));
+    });
+
+    // Font size
+    const savedFontSize = localStorage.getItem('fontSize') || 'medium';
+    function applyFontSize(size) {
+      document.body.classList.remove('font-small', 'font-large');
+      if (size === 'small') document.body.classList.add('font-small');
+      if (size === 'large') document.body.classList.add('font-large');
+      document.querySelectorAll('.font-size-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.size === size);
+      });
+      localStorage.setItem('fontSize', size);
+    }
+    applyFontSize(savedFontSize);
+
+    document.querySelectorAll('.font-size-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyFontSize(btn.dataset.size));
     });
 
     // Initial render — default to today
