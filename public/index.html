@@ -179,6 +179,12 @@
       font-weight: 400;
       margin-right: 1px;
       vertical-align: super;
+    }
+
+    /* Each verse starts on a new line (for prose passages where verses are inline) */
+    .scripture p sup:not(:first-child)::before {
+      content: '\A';
+      white-space: pre;
       line-height: 0;
     }
 
@@ -356,6 +362,93 @@
     }
     .theme-swatch[data-theme="dark"].active {
       border-color: #b0a090;
+    }
+
+    /* Guided mode toggle */
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .settings-toggle-label {
+      font-size: 13px;
+      color: #555;
+    }
+
+    body.theme-dark .settings-toggle-label {
+      color: #aaa;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      background: #ddd;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: none;
+      padding: 0;
+    }
+
+    .toggle-switch.active {
+      background: #b0a090;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(18px);
+    }
+
+    body.theme-dark .toggle-switch {
+      background: #444;
+    }
+
+    body.theme-dark .toggle-switch.active {
+      background: #8a7a6a;
+    }
+
+    /* Guided mode sections */
+    .guided-section {
+      margin: 32px 0;
+    }
+
+    .guided-section-header {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #b0a090;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .guided-section-body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      font-style: italic;
+      color: #888;
+      line-height: 1.7;
+    }
+
+    body.theme-dark .guided-section-header {
+      color: #8a7a6a;
+    }
+
+    body.theme-dark .guided-section-body {
+      color: #777;
     }
 
     /* Font size buttons */
@@ -607,6 +700,13 @@
         <button class="font-size-btn" data-size="small">A</button>
         <button class="font-size-btn" data-size="medium">A</button>
         <button class="font-size-btn" data-size="large">A</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">Mode</div>
+      <div class="settings-toggle">
+        <span class="settings-toggle-label">Guided</span>
+        <button class="toggle-switch" id="guidedToggle" title="Toggle guided BREAD mode"></button>
       </div>
     </div>
   </div>
@@ -983,6 +1083,35 @@
     const passageCache = {};
     const TRANSLATIONS = ['NIV', 'MSG'];
     let currentTranslation = localStorage.getItem('translation') || 'NIV';
+    let guidedMode = localStorage.getItem('guidedMode') === 'true';
+
+    const GUIDED_SECTIONS = {
+      beStill: {
+        title: 'Be Still',
+        body: 'Find a place where you can encounter God, ask him to fill the space, and then take a moment in stillness. Fix your eyes on Jesus and invite the Holy Spirit to guide your time.'
+      },
+      read: {
+        title: 'Read',
+        body: 'Read through the passage for the day with an open mind and heart allowing the words to settle into your being. Reread the passage again slowly. Ask a few questions as you reread.'
+      },
+      encounter: {
+        title: 'Encounter',
+        body: 'Taking your chosen verse, begin to meditate on it. What comes to mind and how does it make you feel? What do you think God is trying to reveal to you through this verse? Allow him to speak to your heart and mind.'
+      },
+      apply: {
+        title: 'Apply',
+        body: "Now, turn your focus outward; think about how you might be able to apply this to your day. Write down the one thing you\u2019re going to try and live out."
+      },
+      devote: {
+        title: 'Devote',
+        body: 'Finally, close by writing a simple prayer of devotion to God. Ask God to fill you afresh and commit your day to him.'
+      }
+    };
+
+    function guidedSectionHtml(key) {
+      const s = GUIDED_SECTIONS[key];
+      return `<div class="guided-section"><div class="guided-section-header">${s.title}</div><div class="guided-section-body">${s.body}</div></div>`;
+    }
 
     function formatDateKey(date) {
       const y = date.getFullYear();
@@ -1032,6 +1161,7 @@
       // Show header immediately, then load verses
       content.innerHTML = `
         <hr class="divider">
+        ${guidedMode ? guidedSectionHtml('beStill') + '<hr class="divider">' : ''}
         <div class="topic">${reading.topic}</div>
         <div class="passage-row">
           <h1 class="passage-title">${reading.passage}</h1>
@@ -1039,6 +1169,7 @@
             ${TRANSLATIONS.map(t => `<option value="${t}"${t === currentTranslation ? ' selected' : ''}>${t}</option>`).join('')}
           </select>
         </div>
+        ${guidedMode ? guidedSectionHtml('read') : ''}
         <hr class="divider">
         <div class="scripture" id="verses">Loading...</div>
       `;
@@ -1064,6 +1195,20 @@
         versesEl.parentNode.appendChild(copyrightEl);
       } else {
         versesEl.innerHTML = '<span class="read-prompt">Passage text not yet available. Open your Bible to read today\'s passage.</span>';
+      }
+
+      // Add remaining guided sections after scripture
+      if (guidedMode) {
+        const guidedAfter = document.createElement('div');
+        guidedAfter.innerHTML = `
+          <hr class="divider">
+          ${guidedSectionHtml('encounter')}
+          <hr class="divider">
+          ${guidedSectionHtml('apply')}
+          <hr class="divider">
+          ${guidedSectionHtml('devote')}
+        `;
+        versesEl.parentNode.appendChild(guidedAfter);
       }
     }
 
@@ -1143,6 +1288,17 @@
     document.querySelectorAll('.font-size-btn').forEach(btn => {
       btn.addEventListener('click', () => applyFontSize(btn.dataset.size));
     });
+
+    // Guided mode
+    const guidedToggle = document.getElementById('guidedToggle');
+    function applyGuidedMode(enabled) {
+      guidedMode = enabled;
+      guidedToggle.classList.toggle('active', enabled);
+      localStorage.setItem('guidedMode', enabled);
+      render();
+    }
+    guidedToggle.classList.toggle('active', guidedMode);
+    guidedToggle.addEventListener('click', () => applyGuidedMode(!guidedMode));
 
     // Initial render — default to today
     render();
