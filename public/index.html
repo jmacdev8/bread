@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Bread Reading</title>
+  <title>Daily BREAD Reading</title>
   <style>
     * {
       margin: 0;
@@ -134,7 +134,7 @@
       color: #1a1a1a;
     }
 
-    .translation-toggle {
+    .translation-select {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 13px;
       color: #555;
@@ -145,11 +145,16 @@
       padding: 4px 10px;
       cursor: pointer;
       transition: background 0.15s;
-      white-space: nowrap;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 24px;
     }
 
-    .translation-toggle:hover {
-      background: #eee;
+    .translation-select:hover {
+      background-color: #eee;
     }
 
     /* Scripture text */
@@ -255,7 +260,7 @@
   <div class="container">
     <div class="header">
       <div class="header-top">
-        <span class="app-title">Daily Bread Reading</span>
+        <span class="app-title">Daily BREAD Reading</span>
       </div>
       <div class="date-nav">
         <button class="nav-arrow" id="prevDay" title="Previous day">&lsaquo;</button>
@@ -697,16 +702,17 @@
         <div class="topic">${reading.topic}</div>
         <div class="passage-row">
           <h1 class="passage-title">${reading.passage}</h1>
-          <button class="translation-toggle" id="translationToggle">${currentTranslation}</button>
+          <select class="translation-select" id="translationSelect">
+            ${TRANSLATIONS.map(t => `<option value="${t}"${t === currentTranslation ? ' selected' : ''}>${t}</option>`).join('')}
+          </select>
         </div>
         <hr class="divider">
         <div class="scripture" id="verses">Loading...</div>
       `;
 
-      // Translation toggle handler
-      document.getElementById('translationToggle').addEventListener('click', () => {
-        const idx = TRANSLATIONS.indexOf(currentTranslation);
-        currentTranslation = TRANSLATIONS[(idx + 1) % TRANSLATIONS.length];
+      // Translation dropdown handler
+      document.getElementById('translationSelect').addEventListener('change', (e) => {
+        currentTranslation = e.target.value;
         localStorage.setItem('translation', currentTranslation);
         render();
       });
